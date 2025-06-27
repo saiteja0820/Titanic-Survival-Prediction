@@ -1,0 +1,176 @@
+import pandas as pd
+import numpy as np
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+import warnings
+warnings.filterwarnings('ignore')
+
+df = pd.read_csv('/content/tested.csv')
+df.head()
+
+df.shape
+
+df.describe()
+
+df.info()
+
+df.isna().sum()
+
+sns.heatmap(df.isnull());
+
+df['Age'].replace(np.nan, df['Age'].mean(), inplace=True)
+df['Fare'].replace(np.nan, df['Fare'].mean(), inplace=True)
+df.drop('Cabin', axis=1,inplace=True)
+df.isna().sum()
+
+df.nunique()
+
+cat_var = ['Pclass', 'Sex', 'SibSp', 'Parch', 'Embarked']
+num_var = ['Age', 'Fare']
+
+round(df['Survived'].value_counts(normalize=True)*100, 2)
+
+ax = sns.countplot(x=df['Survived'], palette='RdBu')
+ax.bar_label(ax.containers[0])
+plt.show()
+
+for column in cat_var:
+    plt.figure(figsize=(12,5))
+    plt.subplot(1,2,1)
+    ax = sns.countplot(x=column, data=df, palette='Accent')
+    ax.bar_label(ax.containers[0])
+
+    plt.subplot(1,2,2)
+    ax = sns.countplot(x=column, data=df, hue='Survived', palette='Accent')
+    ax.bar_label(ax.containers[0])
+    ax.bar_label(ax.containers[1])
+    plt.show()
+
+df[num_var].describe()
+
+for column in num_var:
+    plt.figure(figsize=(14,5))
+    plt.subplot(1,2,1)
+    ax = sns.boxplot(df[column])
+
+    plt.subplot(1,2,2)
+    ax = sns.distplot(df[column])
+    plt.show()
+
+sns.scatterplot(data=df, x='Age', y='Fare', hue='Survived')
+plt.show()
+
+sns.scatterplot(data=df, x='Age', y='Fare', hue='Pclass')
+plt.show()
+
+df_update = df.drop(['PassengerId','Name', 'Ticket'], axis=1)
+df_update.head()
+
+df_update['Sex'].replace({'male':1, 'female':0}, inplace=True)
+df_update['Embarked'].replace({'Q':0, 'S':1, 'C':2}, inplace=True)
+df_update.head()
+
+sns.heatmap(df_update.corr(), annot=True, cmap='viridis')
+plt.title('Correlation')
+plt.show()
+
+#Logistic Regression
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score,\
+confusion_matrix, ConfusionMatrixDisplay, RocCurveDisplay
+
+X = df_update.drop('Survived', axis=1)
+y = df_update['Survived']
+X.head()
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+LR = LogisticRegression(random_state=42)
+LR.fit(X_train, y_train)
+
+LR.coef_
+
+LR.intercept_
+
+y_pred_train = LR.predict(X_train)
+
+print('Accuracy: ', accuracy_score(y_train, y_pred_train))
+print('Precision: ', precision_score(y_train, y_pred_train))
+print('Recall: ', recall_score(y_train, y_pred_train))
+print('F1 Score: ', f1_score(y_train, y_pred_train))
+
+y_pred_LR = LR.predict(X_test)
+
+LR.predict(X_test)
+
+print('Accuracy: ', accuracy_score(y_test, y_pred_LR))
+print('Precision: ', precision_score(y_test, y_pred_LR))
+print('Recall: ', recall_score(y_test, y_pred_LR))
+print('F1 Score: ', f1_score(y_test, y_pred_LR))
+
+cm = confusion_matrix(y_test, y_pred_LR, labels=LR.classes_)
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=LR.classes_)
+disp.plot();
+
+#K-Nearest Neighbour
+
+from sklearn.neighbors import KNeighborsClassifier
+
+knn = KNeighborsClassifier()
+knn.fit(X_train,y_train)
+y_pred_knn = knn.predict(X_test)
+
+print('Accuracy: ', accuracy_score(y_test, y_pred_knn))
+print('Precision: ', precision_score(y_test, y_pred_knn))
+print('Recall: ', recall_score(y_test, y_pred_knn))
+print('F1 Score: ', f1_score(y_test, y_pred_knn))
+
+cm = confusion_matrix(y_test, y_pred_knn, labels=knn.classes_)
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=knn.classes_)
+disp.plot();
+
+#decision Tree
+
+from sklearn.tree import DecisionTreeClassifier
+
+tree = DecisionTreeClassifier()
+tree.fit(X_train,y_train)
+y_pred_tree = tree.predict(X_test)
+
+print('Accuracy: ', accuracy_score(y_test, y_pred_tree))
+print('Precision: ', precision_score(y_test, y_pred_tree))
+print('Recall: ', recall_score(y_test, y_pred_tree))
+print('F1 Score: ', f1_score(y_test, y_pred_tree))
+
+cm = confusion_matrix(y_test, y_pred_tree, labels=tree.classes_)
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=tree.classes_)
+disp.plot();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
