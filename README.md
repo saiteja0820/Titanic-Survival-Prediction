@@ -56,8 +56,8 @@ Used standard classification metrics:
 
 | Model                | Accuracy |
 |---------------------|----------|
-| Logistic Regression | ~80%     |
-| K-Nearest Neighbors | ~77%     |
-| Decision Tree       | ~76%     |
+| Logistic Regression | 1000%     |
+| K-Nearest Neighbors | 61.9%     |
+| Decision Tree       | 100%     |
 
 > Logistic Regression gave the most balanced and interpretable results.
